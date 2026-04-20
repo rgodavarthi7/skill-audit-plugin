@@ -3,7 +3,12 @@
 Generate HTML Skill Audit Report
 
 Converts skill audit eval JSON output to a formatted HTML report.
+Supports both single-skill and multi-skill (cumulative) reports.
 Uses only Python stdlib - no external dependencies required.
+
+Input formats:
+- Single skill (object): {skill_name: ..., summary: ..., ...}
+- Multiple skills (array): [{skill1_data}, {skill2_data}, ...]
 
 Usage:
     python generate-report.py audit-output.json
@@ -85,8 +90,93 @@ def get_grade_color(grade: str) -> str:
     return GRADE_COLORS.get(grade.upper(), COLORS["gray"])
 
 
-def generate_css() -> str:
+def generate_css(multi_skill: bool = False) -> str:
     """Generate inline CSS styles."""
+    sidebar_styles = ""
+    if multi_skill:
+        sidebar_styles = f"""
+        .layout-with-sidebar {{
+            display: flex;
+            gap: 2rem;
+            margin: 0 auto;
+            max-width: 1400px;
+        }}
+
+        .sidebar {{
+            position: sticky;
+            top: 2rem;
+            width: 220px;
+            height: fit-content;
+            max-height: calc(100vh - 4rem);
+            overflow-y: auto;
+            background: {COLORS["card_bg"]};
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }}
+
+        .sidebar h2 {{
+            font-size: 0.875rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: {COLORS["gray"]};
+            margin: 0 0 1rem 0;
+            padding: 0;
+            border: none;
+        }}
+
+        .sidebar nav {{
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }}
+
+        .sidebar a {{
+            display: block;
+            padding: 0.5rem 0.75rem;
+            color: {COLORS["dark"]};
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 0.875rem;
+            transition: background-color 0.2s;
+        }}
+
+        .sidebar a:hover {{
+            background-color: {COLORS["light_gray"]};
+        }}
+
+        .main-content {{
+            flex: 1;
+            min-width: 0;
+        }}
+
+        .skill-section {{
+            margin-bottom: 3rem;
+            padding-top: 2rem;
+            border-top: 3px solid {COLORS["border"]};
+        }}
+
+        .skill-section:first-child {{
+            border-top: none;
+            padding-top: 0;
+        }}
+
+        .summary-table {{
+            width: 100%;
+            margin: 1rem 0 2rem 0;
+        }}
+
+        .summary-table tbody tr {{
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }}
+
+        .summary-table tbody tr:hover {{
+            background-color: {COLORS["cream"]};
+        }}
+        """
+
     return f"""
     <style>
         * {{
@@ -417,12 +507,14 @@ def generate_css() -> str:
             padding-top: 2rem;
             border-top: 1px solid {COLORS["border"]};
         }}
+
+        {sidebar_styles}
     </style>
     """
 
 
-def generate_header(data: Dict[str, Any]) -> str:
-    """Generate HTML header section."""
+def generate_header_single(data: Dict[str, Any]) -> str:
+    """Generate HTML header section for single-skill report."""
     skill_name = escape(data.get("skill_name", "Unknown Skill"))
     timestamp = data.get("timestamp", "")
     model = escape(data.get("model", "Unknown Model"))
@@ -454,6 +546,119 @@ def generate_header(data: Dict[str, Any]) -> str:
             </div>
         </div>
     </header>
+    """
+
+
+def generate_header_multi(skills: List[Dict[str, Any]]) -> str:
+    """Generate HTML header section for multi-skill report."""
+    num_skills = len(skills)
+
+    # Find latest timestamp
+    latest_timestamp = ""
+    for skill in skills:
+        ts = skill.get("timestamp", "")
+        if ts > latest_timestamp:
+            latest_timestamp = ts
+
+    # Format timestamp
+    try:
+        dt = datetime.fromisoformat(latest_timestamp.replace("Z", "+00:00"))
+        formatted_date = dt.strftime("%B %d, %Y at %I:%M %p")
+    except (ValueError, AttributeError):
+        formatted_date = latest_timestamp
+
+    return f"""
+    <header>
+        <h1>Skill Audit Report</h1>
+        <div class="meta">
+            <div class="meta-item">
+                <span class="meta-label">{num_skills} skills audited</span>
+            </div>
+            <div class="meta-item">
+                <span class="meta-label">Last updated:</span>
+                <span>{escape(formatted_date)}</span>
+            </div>
+        </div>
+    </header>
+    """
+
+
+def generate_summary_table(skills: List[Dict[str, Any]]) -> str:
+    """Generate summary table for all skills."""
+    rows = []
+    for skill in skills:
+        skill_name = escape(skill.get("skill_name", "Unknown"))
+        skill_id = skill_name.lower().replace(" ", "-")
+        summary = skill.get("summary", {})
+        checklist = skill.get("checklist", {})
+
+        grade = escape(summary.get("grade", "N/A"))
+        grade_color = get_grade_color(grade)
+
+        passed = checklist.get("passed", 0)
+        total = checklist.get("total", 30)
+        checklist_score = f"{passed}/{total}"
+
+        with_skill_rate = summary.get("with_skill_pass_rate", "N/A")
+        without_skill_rate = summary.get("without_skill_pass_rate", "N/A")
+        delta = escape(summary.get("delta", "N/A"))
+
+        delta_class = ""
+        if isinstance(delta, str) and delta.startswith("+"):
+            delta_class = "delta-positive"
+        elif isinstance(delta, str) and delta.startswith("-"):
+            delta_class = "delta-negative"
+
+        rows.append(f"""
+            <tr onclick="window.location.hash='#{skill_id}'">
+                <td style="font-weight: 600;">{skill_name}</td>
+                <td style="text-align: center;">
+                    <span class="grade-badge" style="background-color: {grade_color}; font-size: 1rem; padding: 0.25rem 0.75rem;">{grade}</span>
+                </td>
+                <td style="text-align: center;">{checklist_score}</td>
+                <td style="text-align: center;">{with_skill_rate}</td>
+                <td style="text-align: center;">{without_skill_rate}</td>
+                <td style="text-align: center;" class="{delta_class}">{delta}</td>
+            </tr>
+        """)
+
+    return f"""
+    <div class="card">
+        <h2>Summary</h2>
+        <table class="summary-table">
+            <thead>
+                <tr>
+                    <th>Skill Name</th>
+                    <th style="text-align: center;">Grade</th>
+                    <th style="text-align: center;">Checklist Score</th>
+                    <th style="text-align: center;">With-Skill Pass Rate</th>
+                    <th style="text-align: center;">Without-Skill Pass Rate</th>
+                    <th style="text-align: center;">Delta</th>
+                </tr>
+            </thead>
+            <tbody>
+                {''.join(rows)}
+            </tbody>
+        </table>
+    </div>
+    """
+
+
+def generate_sidebar(skills: List[Dict[str, Any]]) -> str:
+    """Generate navigation sidebar for multi-skill report."""
+    links = []
+    for skill in skills:
+        skill_name = escape(skill.get("skill_name", "Unknown"))
+        skill_id = skill_name.lower().replace(" ", "-")
+        links.append(f'<a href="#{skill_id}">{skill_name}</a>')
+
+    return f"""
+    <aside class="sidebar">
+        <h2>Skills</h2>
+        <nav>
+            {''.join(links)}
+        </nav>
+    </aside>
     """
 
 
@@ -780,8 +985,39 @@ def generate_fixes_section(data: Dict[str, Any]) -> str:
     return ''.join(html_parts)
 
 
-def generate_html_report(data: Dict[str, Any]) -> str:
-    """Generate complete HTML report."""
+def generate_skill_section(data: Dict[str, Any], multi_skill: bool = False) -> str:
+    """Generate complete section for a single skill."""
+    skill_name = escape(data.get("skill_name", "Unknown"))
+    skill_id = skill_name.lower().replace(" ", "-")
+    summary = data.get("summary", {})
+    grade = escape(summary.get("grade", "N/A"))
+    grade_color = get_grade_color(grade)
+
+    section_open = f'<section id="{skill_id}" class="skill-section">' if multi_skill else '<div class="skill-section">'
+    section_close = '</section>' if multi_skill else '</div>'
+
+    header_html = ""
+    if multi_skill:
+        header_html = f"""
+        <h2 style="font-size: 1.75rem; margin-top: 0;">
+            {skill_name}
+            <span class="grade-badge" style="background-color: {grade_color};">Grade: {grade}</span>
+        </h2>
+        """
+
+    return f"""
+    {section_open}
+        {header_html}
+        {generate_summary_stats(data)}
+        {generate_checklist_table(data)}
+        {generate_eval_section(data)}
+        {generate_fixes_section(data)}
+    {section_close}
+    """
+
+
+def generate_html_report_single(data: Dict[str, Any]) -> str:
+    """Generate complete HTML report for single skill."""
     html_parts = [
         "<!DOCTYPE html>",
         "<html lang=\"en\">",
@@ -789,15 +1025,12 @@ def generate_html_report(data: Dict[str, Any]) -> str:
         "    <meta charset=\"UTF-8\">",
         "    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">",
         f"    <title>Skill Audit Report - {escape(data.get('skill_name', 'Unknown'))}</title>",
-        generate_css(),
+        generate_css(multi_skill=False),
         "</head>",
         "<body>",
         "    <div class=\"container\">",
-        generate_header(data),
-        generate_summary_stats(data),
-        generate_checklist_table(data),
-        generate_eval_section(data),
-        generate_fixes_section(data),
+        generate_header_single(data),
+        generate_skill_section(data, multi_skill=False),
         "        <footer>",
         "            <p>Generated by GMM Nexus Skill Audit Plugin</p>",
         "        </footer>",
@@ -809,7 +1042,44 @@ def generate_html_report(data: Dict[str, Any]) -> str:
     return '\n'.join(html_parts)
 
 
-def read_json_input(input_path: str) -> Dict[str, Any]:
+def generate_html_report_multi(skills: List[Dict[str, Any]]) -> str:
+    """Generate complete HTML report for multiple skills."""
+    # Generate all skill sections
+    skill_sections = []
+    for skill in skills:
+        skill_sections.append(generate_skill_section(skill, multi_skill=True))
+
+    html_parts = [
+        "<!DOCTYPE html>",
+        "<html lang=\"en\">",
+        "<head>",
+        "    <meta charset=\"UTF-8\">",
+        "    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">",
+        "    <title>Skill Audit Report</title>",
+        generate_css(multi_skill=True),
+        "</head>",
+        "<body>",
+        "    <div class=\"container\">",
+        generate_header_multi(skills),
+        generate_summary_table(skills),
+        "        <div class=\"layout-with-sidebar\">",
+        generate_sidebar(skills),
+        "            <main class=\"main-content\">",
+        '\n'.join(skill_sections),
+        "            </main>",
+        "        </div>",
+        "        <footer>",
+        "            <p>Generated by GMM Nexus Skill Audit Plugin</p>",
+        "        </footer>",
+        "    </div>",
+        "</body>",
+        "</html>",
+    ]
+
+    return '\n'.join(html_parts)
+
+
+def read_json_input(input_path: str) -> Dict[str, Any] | List[Dict[str, Any]]:
     """Read JSON input from file or stdin."""
     if input_path == "-":
         # Read from stdin
@@ -850,6 +1120,10 @@ Examples:
   python generate-report.py audit-output.json
   python generate-report.py audit-output.json -o report.html
   cat audit-output.json | python generate-report.py -
+
+Input formats:
+  Single skill: {skill_name: ..., summary: ..., ...}
+  Multiple skills: [{skill1}, {skill2}, ...]
         """,
     )
 
@@ -871,8 +1145,17 @@ Examples:
         # Read input
         data = read_json_input(args.input)
 
-        # Generate report
-        html = generate_html_report(data)
+        # Auto-detect input format and generate appropriate report
+        if isinstance(data, list):
+            # Multi-skill report (array input)
+            if not data:
+                raise ValueError("Input array is empty")
+            html = generate_html_report_multi(data)
+        elif isinstance(data, dict):
+            # Single-skill report (object input)
+            html = generate_html_report_single(data)
+        else:
+            raise ValueError(f"Invalid input format: expected object or array, got {type(data)}")
 
         # Write output
         write_output(html, args.output)

@@ -324,12 +324,22 @@ Expected Behaviors:
 
 ### Step 9: Report Generation
 
-**Goal**: Produce comprehensive audit report
+**Goal**: Produce comprehensive audit report (cumulative — one HTML for all skills)
 
 **Process**:
-- Generate markdown report at `./skill-audit-output/{name}-audit.md`
-- Write JSON eval data to `./skill-audit-output/{name}-eval.json`
-- Optionally generate HTML via external script (if available)
+1. Write per-skill markdown: `./skill-audit-output/{name}-audit.md`
+2. Write per-skill JSON: `./skill-audit-output/{name}-eval.json`
+3. Update cumulative manifest:
+   - Read `./skill-audit-output/audit-data.json` (or create `[]` if first run)
+   - Find existing entry with same `skill_name` → replace it; otherwise append
+   - Write updated `audit-data.json`
+4. Regenerate combined HTML from manifest:
+   ```bash
+   python ${SKILL_DIR}/references/generate-report.py ./skill-audit-output/audit-data.json -o ./skill-audit-output/audit-report.html
+   ```
+   This produces a single HTML file with all audited skills — summary table at top, per-skill details below, sidebar navigation.
+
+**Key behavior**: Running on another skill later adds to the SAME `audit-report.html`. No separate files. Re-auditing a skill replaces its entry (no duplicates).
 
 **Report Structure**:
 ```markdown
@@ -424,11 +434,14 @@ None — all failures resolved in 2 iterations.
 
 **Files Per Skill**:
 - `{name}-audit.md` — Markdown report
-- `{name}-eval.json` — Raw eval data (for HTML generation or external analysis)
+- `{name}-eval.json` — Raw eval data
+
+**Cumulative Files** (always maintained):
+- `audit-data.json` — Manifest: array of all audited skills' eval data
+- `audit-report.html` — Combined HTML report (all skills in one page, updated each run)
 
 **Global Files** (--all mode):
 - `SUMMARY.md` — Aggregate results table
-- `summary.json` — Machine-readable summary
 
 ## Error Handling
 
