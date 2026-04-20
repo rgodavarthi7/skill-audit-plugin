@@ -1,0 +1,410 @@
+{
+  "skill_name": "deploy-app",
+  "audit_date": "2026-04-20T14:32:15Z",
+  "version": "1.0.0",
+  "checklist": {
+    "total_items": 30,
+    "passed": 26,
+    "failed": 2,
+    "skipped": 2,
+    "pass_rate": 0.867,
+    "items": [
+      {
+        "category": "File & Folder Setup",
+        "item": "Skill definition file exists",
+        "status": "pass",
+        "details": "Found .claude/skills/deploy-app/skill.yml"
+      },
+      {
+        "category": "File & Folder Setup",
+        "item": "Skill prompt file exists",
+        "status": "pass",
+        "details": "Found .claude/skills/deploy-app/prompt.md"
+      },
+      {
+        "category": "File & Folder Setup",
+        "item": "Registered in index",
+        "status": "pass",
+        "details": "Listed in .claude/skills/README.md under DevOps category"
+      },
+      {
+        "category": "File & Folder Setup",
+        "item": "Folder structure valid",
+        "status": "pass",
+        "details": "Follows naming convention: deploy-app/"
+      },
+      {
+        "category": "Description Quality",
+        "item": "Description is concise",
+        "status": "pass",
+        "details": "19 words, within 1-2 sentence guideline"
+      },
+      {
+        "category": "Description Quality",
+        "item": "Describes what, not how",
+        "status": "pass",
+        "details": "Focuses on outcome (deploy application), not implementation"
+      },
+      {
+        "category": "Description Quality",
+        "item": "No implementation details",
+        "status": "pass",
+        "details": "Does not mention specific commands or tools"
+      },
+      {
+        "category": "Description Quality",
+        "item": "Avoids jargon",
+        "status": "pass",
+        "details": "Uses clear terms: deploy, environment, configuration"
+      },
+      {
+        "category": "Description Quality",
+        "item": "Matches actual behavior",
+        "status": "pass",
+        "details": "Tested against prompt.md instructions"
+      },
+      {
+        "category": "Instruction Quality",
+        "item": "Instructions are clear",
+        "status": "pass",
+        "details": "Step-by-step deployment instructions provided"
+      },
+      {
+        "category": "Instruction Quality",
+        "item": "Proper markdown formatting",
+        "status": "pass",
+        "details": "Headers, code blocks, lists formatted correctly"
+      },
+      {
+        "category": "Instruction Quality",
+        "item": "Examples provided",
+        "status": "pass",
+        "details": "3 examples: staging deploy, production deploy, rollback"
+      },
+      {
+        "category": "Instruction Quality",
+        "item": "Edge cases documented",
+        "status": "pass",
+        "details": "Covers rollback, failed health checks, missing secrets"
+      },
+      {
+        "category": "Instruction Quality",
+        "item": "No contradictions",
+        "status": "pass",
+        "details": "Instructions consistent throughout"
+      },
+      {
+        "category": "Instruction Quality",
+        "item": "Matches description",
+        "status": "pass",
+        "details": "Instructions deliver on description promise"
+      },
+      {
+        "category": "Required Sections",
+        "item": "Has Purpose/Overview",
+        "status": "pass",
+        "details": "Overview section at line 1-8"
+      },
+      {
+        "category": "Required Sections",
+        "item": "Has Parameters/Inputs",
+        "status": "pass",
+        "details": "Parameters section at line 10-25"
+      },
+      {
+        "category": "Required Sections",
+        "item": "Has Output/Returns",
+        "status": "pass",
+        "details": "Output section at line 65-72"
+      },
+      {
+        "category": "Required Sections",
+        "item": "Has Error Handling",
+        "status": "fail",
+        "details": "No Error Handling section found"
+      },
+      {
+        "category": "Required Sections",
+        "item": "Has Next Steps",
+        "status": "fail",
+        "details": "No Next Steps or Follow-up section found"
+      },
+      {
+        "category": "Trigger Accuracy",
+        "item": "Triggers match skill name",
+        "status": "pass",
+        "details": "Triggers include 'deploy', 'deployment', 'ship to production'"
+      },
+      {
+        "category": "Trigger Accuracy",
+        "item": "Captures valid use cases",
+        "status": "pass",
+        "details": "Covers deploy to staging, production, rollback"
+      },
+      {
+        "category": "Trigger Accuracy",
+        "item": "Not overly broad",
+        "status": "pass",
+        "details": "Specific to deployment, won't fire on 'build' or 'test'"
+      },
+      {
+        "category": "Trigger Accuracy",
+        "item": "No conflicts",
+        "status": "pass",
+        "details": "No overlap with build-app or test-app triggers"
+      },
+      {
+        "category": "Registration",
+        "item": "Listed in index",
+        "status": "pass",
+        "details": "Found in .claude/skills/README.md line 142"
+      },
+      {
+        "category": "Registration",
+        "item": "Appropriate category",
+        "status": "pass",
+        "details": "DevOps category is appropriate"
+      },
+      {
+        "category": "Registration",
+        "item": "No duplicates",
+        "status": "pass",
+        "details": "Single registration found"
+      },
+      {
+        "category": "Smoke Tests",
+        "item": "Has 3+ test prompts",
+        "status": "skip",
+        "details": "No smoke tests defined (optional for now)"
+      },
+      {
+        "category": "Smoke Tests",
+        "item": "Tests cover main cases",
+        "status": "skip",
+        "details": "No smoke tests defined (optional for now)"
+      },
+      {
+        "category": "Smoke Tests",
+        "item": "Tests include edge cases",
+        "status": "skip",
+        "details": "No smoke tests defined (optional for now)"
+      }
+    ]
+  },
+  "eval": {
+    "prompts": [
+      {
+        "id": "prompt_1",
+        "description": "Deploy backend API to staging environment",
+        "prompt": "Deploy the backend API to staging. Use the main branch, enable debug logging, and notify the #deployments Slack channel.",
+        "assertions": [
+          {
+            "id": "assert_1_1",
+            "description": "Checks for target environment (staging)",
+            "without_skill": false,
+            "with_skill": true,
+            "improved": true
+          },
+          {
+            "id": "assert_1_2",
+            "description": "Verifies branch selection (main)",
+            "without_skill": false,
+            "with_skill": true,
+            "improved": true
+          },
+          {
+            "id": "assert_1_3",
+            "description": "Confirms debug logging enabled",
+            "without_skill": false,
+            "with_skill": true,
+            "improved": true
+          },
+          {
+            "id": "assert_1_4",
+            "description": "Validates health check execution",
+            "without_skill": true,
+            "with_skill": true,
+            "improved": false
+          },
+          {
+            "id": "assert_1_5",
+            "description": "Ensures Slack notification sent",
+            "without_skill": false,
+            "with_skill": true,
+            "improved": true
+          },
+          {
+            "id": "assert_1_6",
+            "description": "Checks deployment summary generated",
+            "without_skill": true,
+            "with_skill": true,
+            "improved": false
+          }
+        ]
+      },
+      {
+        "id": "prompt_2",
+        "description": "Deploy frontend to production with rollback plan",
+        "prompt": "Deploy the frontend React app to production. Use the v2.1.0 tag. If health checks fail, automatically roll back to the previous version.",
+        "assertions": [
+          {
+            "id": "assert_2_1",
+            "description": "Confirms production environment selected",
+            "without_skill": false,
+            "with_skill": true,
+            "improved": true
+          },
+          {
+            "id": "assert_2_2",
+            "description": "Verifies tag v2.1.0 used",
+            "without_skill": false,
+            "with_skill": true,
+            "improved": true
+          },
+          {
+            "id": "assert_2_3",
+            "description": "Validates production checks (approval, backup)",
+            "without_skill": false,
+            "with_skill": true,
+            "improved": true
+          },
+          {
+            "id": "assert_2_4",
+            "description": "Ensures health checks executed",
+            "without_skill": true,
+            "with_skill": true,
+            "improved": false
+          },
+          {
+            "id": "assert_2_5",
+            "description": "Confirms rollback plan defined",
+            "without_skill": false,
+            "with_skill": true,
+            "improved": true
+          },
+          {
+            "id": "assert_2_6",
+            "description": "Checks for production deployment warning",
+            "without_skill": false,
+            "with_skill": true,
+            "improved": true
+          }
+        ]
+      },
+      {
+        "id": "prompt_3",
+        "description": "Rollback deployment after failed health checks",
+        "prompt": "The last deployment to production failed health checks. Roll back to the previous stable version immediately.",
+        "assertions": [
+          {
+            "id": "assert_3_1",
+            "description": "Detects rollback scenario",
+            "without_skill": false,
+            "with_skill": true,
+            "improved": true
+          },
+          {
+            "id": "assert_3_2",
+            "description": "Identifies production environment",
+            "without_skill": true,
+            "with_skill": true,
+            "improved": false
+          },
+          {
+            "id": "assert_3_3",
+            "description": "Finds previous stable version",
+            "without_skill": false,
+            "with_skill": true,
+            "improved": true
+          },
+          {
+            "id": "assert_3_4",
+            "description": "Executes rollback steps",
+            "without_skill": false,
+            "with_skill": true,
+            "improved": true
+          },
+          {
+            "id": "assert_3_5",
+            "description": "Runs health checks after rollback",
+            "without_skill": true,
+            "with_skill": true,
+            "improved": false
+          },
+          {
+            "id": "assert_3_6",
+            "description": "Notifies team of rollback",
+            "without_skill": false,
+            "with_skill": true,
+            "improved": true
+          }
+        ]
+      }
+    ],
+    "summary": {
+      "total_assertions": 18,
+      "without_skill_passed": 6,
+      "without_skill_pass_rate": 0.333,
+      "with_skill_passed": 16,
+      "with_skill_pass_rate": 0.889,
+      "delta": 0.556,
+      "improved_count": 12,
+      "regressed_count": 0,
+      "unchanged_count": 6
+    }
+  },
+  "fixes_applied": [
+    {
+      "issue": "Missing Error Handling section",
+      "fix_type": "add_section",
+      "location": "prompt.md:74",
+      "content": "## Error Handling\n\nIf deployment fails:\n- Check build logs for compilation errors\n- Verify environment variables are set correctly\n- Ensure database migrations completed successfully\n- Review health check endpoint responses\n\nIf health checks fail:\n- Automatically roll back to previous version\n- Notify on-call engineer via PagerDuty\n- Post incident in #incidents Slack channel\n\nIf rollback fails:\n- Escalate to DevOps lead immediately\n- Document failure in incident log\n- Prepare for manual intervention"
+    },
+    {
+      "issue": "Missing Next Steps section",
+      "fix_type": "add_section",
+      "location": "prompt.md:95",
+      "content": "## Next Steps\n\nAfter successful deployment:\n1. Monitor error rates in Datadog for 15 minutes\n2. Check latency metrics for regressions\n3. Verify feature flags are working as expected\n4. Update deployment log in Confluence\n5. Close deployment issue in Jira\n\nIf deployment fails:\n1. Review error logs and identify root cause\n2. Create incident ticket if needed\n3. Schedule post-mortem if outage occurred\n4. Update runbook with lessons learned"
+    }
+  ],
+  "iteration_2": {
+    "checklist": {
+      "total_items": 30,
+      "passed": 28,
+      "failed": 0,
+      "skipped": 2,
+      "pass_rate": 0.933
+    },
+    "eval": {
+      "summary": {
+        "total_assertions": 18,
+        "without_skill_passed": 6,
+        "without_skill_pass_rate": 0.333,
+        "with_skill_passed": 18,
+        "with_skill_pass_rate": 1.0,
+        "delta": 0.667,
+        "improved_count": 14,
+        "regressed_count": 0,
+        "unchanged_count": 4
+      }
+    }
+  },
+  "grade": {
+    "pre_fix": "B",
+    "post_fix": "A",
+    "reasoning": "Pre-fix: 87% checklist pass rate, +56% eval delta, missing 2 sections. Post-fix: 93% checklist pass rate, +67% eval delta, all critical sections present."
+  },
+  "recommendations": [
+    "Add smoke tests to improve regression detection",
+    "Consider adding examples for multi-region deployments",
+    "Document canary deployment strategy",
+    "Add monitoring dashboards to Next Steps section"
+  ],
+  "metadata": {
+    "audit_duration_seconds": 127,
+    "llm_provider": "anthropic",
+    "llm_model": "claude-sonnet-4.5",
+    "total_llm_calls": 8,
+    "total_tokens": 45230
+  }
+}

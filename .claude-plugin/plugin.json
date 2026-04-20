@@ -1,0 +1,11 @@
+{
+  "name": "skill-audit-plugin",
+  "description": "Audit Claude Code skills against a 30-item quality checklist, run test prompts, benchmark with/without comparisons, and generate HTML reports. Use when testing skill quality, validating skill improvements, benchmarking skills, or running the full eval pipeline.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Mahima Gujjarlapudi"
+  },
+  "license": "MIT",
+  "keywords": ["skills", "audit", "testing", "quality", "evaluation", "benchmark"],
+  "skills": "./skills/"
+}
