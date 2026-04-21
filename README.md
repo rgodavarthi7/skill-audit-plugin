@@ -4,8 +4,14 @@ A Claude Code plugin that audits skills against a comprehensive 30-item quality 
 
 ## Installation
 
+Run these commands inside a Claude Code session:
+
 ```bash
-claude plugin add https://github.com/Mahima-Gujjarlapudi/skill-audit-plugin
+# Add the marketplace
+/plugin marketplace add rgodavarthi7/skill-audit-plugin
+
+# Install the plugin
+/plugin install skill-audit-plugin@skill-audit-plugin
 ```
 
 ## Quick Start (Verify Installation)

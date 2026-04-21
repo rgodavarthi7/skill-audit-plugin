@@ -1,0 +1,10 @@
+{
+  "name": "skill-audit-plugin",
+  "description": "Audit Claude Code skills against a 30-item quality checklist, run comparative evals, and generate HTML reports.",
+  "plugins": [
+    {
+      "name": "skill-audit-plugin",
+      "path": "."
+    }
+  ]
+}
