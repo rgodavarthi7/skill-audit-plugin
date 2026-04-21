@@ -1,0 +1,16 @@
+# Audit output
+skill-audit-output/
+tmp-skill-audit/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/

@@ -5,8 +5,22 @@ A Claude Code plugin that audits skills against a comprehensive 30-item quality 
 ## Installation
 
 ```bash
-claude plugin add https://github.com/MCGHealth/skill-audit-plugin
+claude plugin add https://github.com/Mahima-Gujjarlapudi/skill-audit-plugin
 ```
+
+## Quick Start (Verify Installation)
+
+After installing, copy the included dummy skill into your project and audit it:
+
+```bash
+# Copy the example skill into your project's skills directory
+cp -r <plugin-path>/examples/dummy-skill .claude/skills/hello-world
+
+# Run the audit to verify everything works
+/audit-skills hello-world --checklist-only
+```
+
+You should see a checklist score and report generated in `./skill-audit-output/`.
 
 ## Usage
 
@@ -124,11 +138,11 @@ Human-readable report with:
 - Iteration 2 results (if fixes applied)
 - Recommendations for manual review
 
-### HTML Report (optional)
+### HTML Report
 ```
-<output-dir>/<skill-name>-audit-report.html
+<output-dir>/audit-report.html
 ```
-Generated if `python3` is available with `markdown` package installed.
+Cumulative HTML report containing all audited skills in a single page with sidebar navigation. Updated automatically each run. Generated via `generate-report.py` (stdlib-only Python, no pip dependencies).
 
 ### Raw JSON
 ```
@@ -144,15 +158,14 @@ Machine-readable data for CI/CD integration:
 ## Requirements
 
 - **Claude Code CLI**: Version 1.0.0 or higher
-- **Python 3.10+**: (optional) For HTML report generation
-  - Install: `pip install markdown pygments`
+- **Python 3.10+**: (optional) For HTML report generation — stdlib only, no pip install needed
 - **Git**: For detecting skill changes and generating diffs
 
 ## Output Directory
 
-Default: `.claude/audits/YYYY-MM-DD/`
+Default: `./skill-audit-output/`
 
-Each audit run creates a timestamped directory to track historical results and measure skill quality improvements over time.
+Override with `--output-dir <path>`. Each audit run updates the cumulative `audit-report.html` and `audit-data.json` in this directory.
 
 ## Grading Scale
 
@@ -195,6 +208,6 @@ MIT License - see LICENSE file for details
 
 ## Support
 
-- Issues: https://github.com/MCGHealth/skill-audit-plugin/issues
-- Docs: https://github.com/MCGHealth/skill-audit-plugin/wiki
-- Changelog: https://github.com/MCGHealth/skill-audit-plugin/blob/main/CHANGELOG.md
+- Issues: https://github.com/Mahima-Gujjarlapudi/skill-audit-plugin/issues
+- Docs: https://github.com/Mahima-Gujjarlapudi/skill-audit-plugin/wiki
+- Changelog: https://github.com/Mahima-Gujjarlapudi/skill-audit-plugin/blob/main/CHANGELOG.md
